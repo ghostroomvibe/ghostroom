@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7J1Z1XPZRQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-7J1Z1XPZRQ');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GhostRoom | The Void</title>
+    <meta name="title" content="GhostRoom | The Void">
+    <meta name="description"
+        content="24-hour ephemeral frequencies. Send ghost whispers that burn after reading. No traces. No logs. Just the void.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ghostroom.buzz/">
+    <meta property="og:title" content="GhostRoom | Enter The Void">
+    <meta property="og:description"
+        content="Anonymous whispers that self-destruct. Join the 24-hour frequency before it fades.">
+    <meta property="og:image" content="https://ghostroom.buzz/GhostRoom.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ghostroom.buzz/">
+    <meta property="twitter:title" content="GhostRoom | The Void">
+    <meta property="twitter:description" content="Whisper a secret. Watch it burn. 24-hour anonymous chat.">
+    <meta property="twitter:image" content="https://ghostroom.buzz/GhostRoom.jpg">
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg: #050505;
+            --card: #121212;
+            --accent: #ff2d55;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            height: 100dvh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .screen {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card.loading {
+            pointer-events: none;
+            opacity: 0.7;
+            transform: scale(0.95);
+        }
+
+        .msg-bubble {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 24px;
+            font-size: 14px;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            /* white-space: pre-line; */
+
+        }
+
+        .msg-sent {
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-received {
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg-ghost {
+            filter: blur(12px);
+            cursor: pointer;
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+        }
+
+        .msg-ghost.revealing {
+            filter: blur(0);
+            border: 1px solid var(--accent);
+        }
+
+        .msg-burned {
+            opacity: 0.1;
+            filter: grayscale(1) blur(2px);
+            pointer-events: none;
+        }
+
+        .loading-shimmer {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent 25%, rgba(255, 255, 255, 0.05) 50%, transparent 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .prompt-glitch {
+            animation: promptPulse 4s infinite;
+        }
+
+        @keyframes promptPulse {
+            0% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 1;
+                color: #00d2ff;
+            }
+
+            100% {
+                opacity: 0.4;
+            }
+        }
+
+        .unread-badge {
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 900;
+            box-shadow: 0 0 15px rgba(255, 45, 85, 0.5);
+            animation: pulse-ring 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 45, 85, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 45, 85, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 45, 85, 0);
+            }
+        }
+
+        #chat-messages {
+            scroll-behavior: smooth;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: white;
+            color: black;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 800;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* small reply snippet style */
+        .reply-snippet {
+            background: rgba(255,255,255,0.03);
+            border-left: 3px solid rgba(255,255,255,0.06);
+            padding: 6px 10px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            border-radius: 6px;
+            max-width: 76%;
+            color: rgba(255,255,255,0.7);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* translate visual on drag */
+        .dragging {
+            transition: none !important;
+            will-change: transform;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="toast">LINK COPIED TO VOID</div>
+
+    <!-- HOME SCREEN -->
+    <div id="screen-home" class="screen active p-6 overflow-y-auto pb-32 hide-scroll">
+        <header class="mt-8 mb-10 flex justify-between items-start">
+            <div>
+                <h1 class="text-4xl font-extrabold tracking-tighter italic">GHOSTROOM</h1>
+                <p class="text-white/30 text-[10px] mt-1 font-bold tracking-widest uppercase" id="user-id-display">
+                    Syncing Frequency...</p>
+            </div>
+            <div id="connection-dot" class="w-2 h-2 rounded-full bg-red-500 mt-4 shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+            </div>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 mb-10">
+            <button id="btn-create-request" class="card p-6 text-left border-pink-500/30">
+                <div id="shimmer-request" class="hidden loading-shimmer"></div>
+                <i data-lucide="link" class="text-pink-500 mb-3"></i>
+                <h3 class="font-bold text-sm">Bio Link</h3>
+                <p class="text-[10px] text-white/30 font-black uppercase tracking-wider">Follower Requests</p>
+            </button>
+            <button id="btn-create-community" class="card p-6 text-left">
+                <div id="shimmer-public" class="hidden loading-shimmer"></div>
+                <i data-lucide="flame" class="text-orange-500 mb-3"></i>
+                <h3 class="font-bold text-sm">Public Vibe</h3>
+                <p class="text-[10px] text-white/30 font-black uppercase tracking-wider">Global Chat</p>
+            </button>
+        </div>
+
+        <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-4 px-2">Frequency Inbox</h4>
+        <div id="history-container" class="space-y-3"></div>
+    </div>
+
+    <!-- CHAT SCREEN -->
+    <div id="screen-chat" class="screen">
+        <header class="p-4 flex items-center justify-between border-b border-white/5 bg-black/50 backdrop-blur-lg">
+            <button id="btn-back" class="text-white/30 p-2"><i data-lucide="chevron-left"></i></button>
+            <div class="text-center">
+                <p class="text-[10px] font-black text-pink-500 uppercase tracking-[0.2em]" id="chat-title">Whisper Room
+                </p>
+                <p class="text-[9px] text-white/20 font-bold" id="chat-subtitle">#000000</p>
+                <p class="text-[9px] text-white/40 font-bold" id="creator-id"></p>
+                <p
+                    class="text-[8px] text-white/40 font-bold mt-1 uppercase tracking-wider flex items-center justify-center gap-1">
+                    <i data-lucide="clock" size="8"></i> <span id="timer-display">--:--:--</span> LEFT
+                </p>
+            </div>
+            <button id="btn-share"
+                class="p-2 bg-white/5 rounded-xl border border-white/10 active:scale-90 transition-transform">
+                <i data-lucide="share-2" size="16"></i>
+            </button>
+        </header>
+
+        <div
+            class="bg-white/5 border-b border-white/5 py-2 px-4 text-center min-h-[36px] flex items-center justify-center">
+            <p id="void-prompt" class="text-[10px] text-cyan-400 font-bold italic prompt-glitch tracking-wide">
+                Initializing the void...
+            </p>
+        </div>
+
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-2 hide-scroll"></div>
+
+        <div id="reply-preview"
+            class="hidden px-4 py-3 bg-white/5 border-t border-white/10 flex justify-between items-center text-[10px]">
+            <div class="border-l-2 border-pink-500 pl-3">
+                <p class="text-white/40 uppercase font-black">Replying to</p>
+                <p id="reply-text" class="text-white/80 italic truncate max-w-[200px]"></p>
+            </div>
+            <button id="btn-cancel-reply" class="p-2"><i data-lucide="x" size="14"></i></button>
+        </div>
+
+        <div class="p-4 pb-8 bg-black">
+            <div id="identity-menu" class="hidden mb-4 p-3 bg-white/5 rounded-2xl border border-white/10 space-y-3">
+                <p class="text-[9px] font-black text-white/20 uppercase tracking-widest">Choose Frequency Identity</p>
+                <div class="flex gap-2">
+                    <button id="id-anon"
+                        class="flex-1 text-[10px] p-2 rounded-xl border border-white bg-white text-black">ANON</button>
+                    <button id="id-uid"
+                        class="flex-1 text-[10px] p-2 rounded-xl border border-white/5 bg-white/5 text-white/40">ID</button>
+                    <button id="id-custom"
+                        class="flex-1 text-[10px] p-2 rounded-xl border border-white/5 bg-white/5 text-white/40">CUSTOM</button>
+                </div>
+                <input type="text" id="custom-name-input"
+                    class="hidden w-full bg-white/5 border border-white/5 p-2 rounded-xl text-xs outline-none"
+                    placeholder="Enter custom mask...">
+            </div>
+
+            <form id="chat-form"
+                class="flex items-end gap-2 p-2 bg-white/5 border border-white/10 rounded-[30px] focus-within:border-white/20 transition-all">
+                <button type="button" id="btn-identity-toggle"
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-white/20">
+                    <i data-lucide="user" size="18"></i>
+                </button>
+                <button type="button" id="btn-ghost-toggle"
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-white/20 transition-colors">
+                    <i data-lucide="ghost" size="18"></i>
+                </button>
+                <textarea id="chat-input" rows="1"
+                    class="flex-1 bg-transparent py-3 px-1 text-sm outline-none resize-none placeholder:text-white/10"
+                    placeholder="Whisper something..."></textarea>
+                <button type="submit" id="btn-send"
+                    class="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center disabled:opacity-20">
+                    <i data-lucide="arrow-up" size="20"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, serverTimestamp, updateDoc, getDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        // FIREBASE INITIALIZATION 
+        let firebaseApp, auth, db, appId;
+
+        // 1. Replace the values below with your actual Firebase Project keys
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEUDD0iB4iGFSDoC0a3wCXF8PT098Su3w", // Your API Key
+            authDomain: "anonymous-messaging-f93c0.firebaseapp.com",
+            projectId: "anonymous-messaging-f93c0",
+            storageBucket: "anonymous-messaging-f93c0.firebasestorage.app",
+            messagingSenderId: "990716606250",
+            appId: "G-GBMJM3GM3B"
+        };
+
+        try {
+            // Initialize Firebase
+            firebaseApp = initializeApp(firebaseConfig);
+            auth = getAuth(firebaseApp);
+            db = getFirestore(firebaseApp);
+
+            // Set your App ID for the Firestore paths
+            appId = 'ghostroom-v4-influence';
+
+            console.log("Void Frequency Initialized...");
+        } catch (e) {
+            console.error("Initialization failed:", e);
+        }
+
+
+        // STATE
+        let user = null;
+        let currentRoom = null;
+        let unsubChat = null;
+        let isGhostMode = false;
+        let replyingTo = null;
+        let senderIdentity = 'anon';
+        let timerInterval = null;
+
+        const PROMPTS = [
+            "Whisper a secret the creator should know...",
+            "What's your first impression of this mask?",
+            "If you had 24 hours of total anonymity, what would you say?",
+            "The void is listening. Be bold.",
+            "Say something you'd never say in a DM."
+        ];
+
+        // UI HELPERS
+        lucide.createIcons();
+        const showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(`screen-${id}`).classList.add('active');
+        };
+
+        const showToast = (text) => {
+            const toast = document.getElementById('toast');
+            toast.textContent = text;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        };
+
+        const updatePrompt = () => {
+            const el = document.getElementById('void-prompt');
+            if (el) el.textContent = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
+        };
+        setInterval(updatePrompt, 8000);
+        updatePrompt();
+
+        // AUTH INITIALIZATION
+        const initAuth = async () => {
+            if (!auth) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth failed:", err);
+            }
+        };
+
+        onAuthStateChanged(auth, (u) => {
+            if (u) {
+                user = u;
+                document.getElementById('user-id-display').textContent = `UID: ${u.uid.substring(0, 6).toUpperCase()}`;
+                const dot = document.getElementById('connection-dot');
+                dot.classList.remove('bg-red-500');
+                dot.classList.add('bg-green-500');
+                dot.style.boxShadow = '0 0 10px rgba(34,197,94,0.5)';
+                loadHistory();
+                checkHash();
+            }
+        });
+
+        const checkHash = () => {
+            const rid = window.location.hash.slice(1);
+            if (rid) joinRoom(rid);
+            else showScreen('home');
+        };
+        window.addEventListener('hashchange', checkHash);
+
+        // CORE ROOM ACTIONS
+        const createRequestRoom = async () => {
+            if (!user || !db) return;
+            const btn = document.getElementById('btn-create-request');
+            const shimmer = document.getElementById('shimmer-request');
+            btn.classList.add('loading');
+            shimmer.classList.remove('hidden');
+
+            try {
+                const rid = Math.random().toString(36).substring(2, 10);
+                const now = Date.now();
+                const expiresAt = now + (24 * 60 * 60 * 1000);
+
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', rid), {
+                    id: rid,
+                    type: 'request',
+                    ownerId: user.uid,
+                    createdAt: now,
+                    expiresAt: expiresAt,
+                    lastActivity: now
+                });
+
+                await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'history', rid), {
+                    roomId: rid, type: 'request', isOwner: true, timestamp: now, expiresAt: expiresAt, unread: 0
+                });
+
+                window.location.hash = rid;
+            } catch (err) {
+                console.error(err);
+                btn.classList.remove('loading');
+                shimmer.classList.add('hidden');
+            }
+        };
+
+        const createCommunityRoom = async () => {
+            if (!user || !db) return;
+            const btn = document.getElementById('btn-create-community');
+            const shimmer = document.getElementById('shimmer-public');
+            btn.classList.add('loading');
+            shimmer.classList.remove('hidden');
+
+            try {
+                const rid = Math.random().toString(36).substring(2, 10);
+                const now = Date.now();
+                const expiresAt = now + (24 * 60 * 60 * 1000);
+
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', rid), {
+                    id: rid, type: 'community', ownerId: user.uid, createdAt: now, expiresAt
+                });
+                await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'history', rid), {
+                    roomId: rid, type: 'community', timestamp: now, expiresAt
+                });
+                window.location.hash = rid;
+            } catch (err) {
+                console.error(err);
+                btn.classList.remove('loading');
+                shimmer.classList.add('hidden');
+            }
+        };
+
+        const joinRoom = async (rid) => {
+            if (!db) return;
+            const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', rid));
+
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('loading'));
+            document.querySelectorAll('.loading-shimmer').forEach(s => s.classList.add('hidden'));
+
+            if (!snap.exists()) {
+                window.location.hash = '';
+                return;
+            }
+            const data = snap.data();
+            if (Date.now() > data.expiresAt) {
+                alert("This frequency has faded.");
+                window.location.hash = '';
+                return;
+            }
+
+            currentRoom = data;
+            document.getElementById('chat-title').textContent = data.type === 'request' ? 'Request Room' : 'Global Vibe';
+            document.getElementById('chat-subtitle').textContent = `#${rid.toUpperCase()}`;
+            if (data.ownerId) {
+                document.getElementById('creator-id').textContent = `CREATOR: ${data.ownerId.substring(0, 6).toUpperCase()}`;
+            }
+            showScreen('chat');
+            startTimer(data.expiresAt);
+            listenToChat(rid);
+
+            // Add to history if not already there
+            const historyRef = doc(db, 'artifacts', appId, 'users', user.uid, 'history', rid);
+            const historySnap = await getDoc(historyRef);
+            if (!historySnap.exists()) {
+                await setDoc(historyRef, {
+                    roomId: rid,
+                    type: data.type,
+                    timestamp: Date.now(),
+                    expiresAt: data.expiresAt,
+                    unread: 0
+                });
+            } else {
+                await updateDoc(historyRef, {
+                    unread: 0
+                }).catch(() => { });
+            }
+        };
+
+        function escapeHTML(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        }
+
+
+        const listenToChat = (rid) => {
+            if (unsubChat) unsubChat();
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms', rid, 'messages'), orderBy('createdAt', 'asc'), limit(100));
+
+            unsubChat = onSnapshot(q, (snap) => {
+                const container = document.getElementById('chat-messages');
+                container.innerHTML = '';
+                snap.docs.forEach(docSnap => {
+                    const m = docSnap.data();
+                    const mid = docSnap.id;
+                    const isMe = m.uid === user.uid;
+                    const isBurned = m.status === 'burned';
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full group`;
+
+                    let identityLabel = '';
+                    if (!isMe) {
+                        const isOwner = currentRoom.ownerId === m.uid;
+                        const name = isOwner ? 'CREATOR ✦' : (m.identity === 'custom' ? (m.customName || 'Ghost') : `GHOST_${m.uid.substring(0, 4)}`);
+                        identityLabel = `<div class="text-[9px] ${isOwner ? 'text-pink-500' : 'text-white/30'} font-black mb-1 px-3 uppercase">${name}</div>`;
+                    }
+
+                    // reply snippet if present
+                    const replySnippet = m.replyToText ? `<div class="reply-snippet">${escapeHTML(m.replyToText)}</div>` : '';
+
+                    wrapper.innerHTML = `
+                        ${identityLabel}
+                        ${replySnippet}
+                        <div id="msg-${mid}" class="msg-bubble ${isMe ? 'bg-pink-600 msg-sent' : 'bg-white/5 border border-white/10 msg-received'}
+                             ${m.isGhost && !isBurned ? 'msg-ghost' : ''} ${isBurned ? 'msg-burned' : ''}">
+                             ${isBurned ? '✦ VANISHED ✦' : escapeHTML(m.text)}
+                        </div>
+                    `;
+
+                    const bubble = wrapper.querySelector('.msg-bubble');
+                    if (m.isGhost && !isBurned) {
+                        bubble.onclick = () => revealGhost(mid);
+                    }
+
+                    // Attach slide-to-reply handlers
+                    attachSwipeToBubble(wrapper, bubble, mid, m.text || '');
+
+                    container.appendChild(wrapper);
+                });
+                container.scrollTop = container.scrollHeight;
+                lucide.createIcons();
+            }, (err) => console.error("Snapshot error:", err));
+        };
+
+        const revealGhost = async (mid) => {
+            const el = document.getElementById(`msg-${mid}`);
+            if (el.classList.contains('revealing')) return;
+            el.classList.add('revealing');
+
+            setTimeout(async () => {
+                if (currentRoom) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoom.id, 'messages', mid), {
+                        status: 'burned'
+                    });
+                }
+            }, 5000);
+        };
+
+        const startTimer = (expiry) => {
+            if (timerInterval) clearInterval(timerInterval);
+            const update = () => {
+                const diff = expiry - Date.now();
+                if (diff <= 0) {
+                    document.getElementById('timer-display').textContent = "EXPIRED";
+                    clearInterval(timerInterval);
+                } else {
+                    const h = Math.floor(diff / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    const s = Math.floor((diff % 60000) / 1000);
+                    document.getElementById('timer-display').textContent = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+            };
+            update();
+            timerInterval = setInterval(update, 1000);
+        };
+
+        const loadHistory = () => {
+            if (!user || !db) return;
+            const q = query(collection(db, 'artifacts', appId, 'users', user.uid, 'history'), orderBy('timestamp', 'desc'));
+            onSnapshot(q, (snap) => {
+                const container = document.getElementById('history-container');
+                container.innerHTML = '';
+                snap.docs.forEach(d => {
+                    const item = d.data();
+                    const isDead = Date.now() > item.expiresAt;
+                    const div = document.createElement('div');
+                    div.className = 'card p-5 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform';
+                    div.onclick = () => window.location.hash = item.roomId;
+
+                    const unreadTag = item.unread > 0 ? `<span class="unread-badge ml-2">${item.unread} NEW</span>` : '';
+
+                    div.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="w-1.5 h-1.5 rounded-full ${item.type === 'request' ? 'bg-pink-500' : 'bg-orange-500'}"></div>
+                            <div>
+                                <div class="font-bold text-sm flex items-center">#${item.roomId.toUpperCase()} ${unreadTag}</div>
+                                <div class="text-[8px] text-white/20 font-black uppercase tracking-tighter">
+                                    ${item.type} room • ${isDead ? 'EXPIRED' : 'ACTIVE'}
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" size="14" class="text-white/10"></i>
+                    `;
+                    container.appendChild(div);
+                });
+                lucide.createIcons();
+            }, (err) => console.error("History snapshot error:", err));
+        };
+
+        // START
+        initAuth();
+
+        // EVENT LISTENERS
+        document.getElementById('btn-create-request').onclick = createRequestRoom;
+        document.getElementById('btn-create-community').onclick = createCommunityRoom;
+        document.getElementById('btn-back').onclick = () => window.location.hash = '';
+
+        document.getElementById('btn-share').onclick = () => {
+            const url = window.location.href;
+            const tempInput = document.createElement('input');
+            tempInput.style.position = 'absolute';
+            tempInput.style.left = '-1000px';
+            tempInput.style.top = '-1000px';
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast("LINK COPIED FOR BIO");
+        };
+
+        document.getElementById('btn-ghost-toggle').onclick = () => {
+            isGhostMode = !isGhostMode;
+            document.getElementById('btn-ghost-toggle').classList.toggle('text-pink-500', isGhostMode);
+            document.getElementById('btn-ghost-toggle').classList.toggle('text-white/20', !isGhostMode);
+        };
+
+        document.getElementById('btn-identity-toggle').onclick = () => {
+            document.getElementById('identity-menu').classList.toggle('hidden');
+        };
+
+        const setIdentity = (type) => {
+            senderIdentity = type;
+            const btns = { anon: 'id-anon', uid: 'id-uid', custom: 'id-custom' };
+            Object.keys(btns).forEach(key => {
+                const btn = document.getElementById(btns[key]);
+                btn.className = key === type ? "flex-1 text-[10px] p-2 rounded-xl border border-white bg-white text-black" : "flex-1 text-[10px] p-2 rounded-xl border border-white/5 bg-white/5 text-white/40";
+            });
+            document.getElementById('custom-name-input').classList.toggle('hidden', type !== 'custom');
+        };
+
+        document.getElementById('id-anon').onclick = () => setIdentity('anon');
+        document.getElementById('id-uid').onclick = () => setIdentity('uid');
+        document.getElementById('id-custom').onclick = () => setIdentity('custom');
+
+        document.getElementById('btn-cancel-reply').onclick = () => {
+            clearReplyPreview();
+        };
+
+        function showReplyPreview(reply) {
+            replyingTo = reply;
+            const preview = document.getElementById('reply-preview');
+            const textEl = document.getElementById('reply-text');
+            textEl.textContent = reply.text.length > 120 ? reply.text.substring(0, 120) + '…' : reply.text;
+            preview.classList.remove('hidden');
+        }
+
+        function clearReplyPreview() {
+            replyingTo = null;
+            const preview = document.getElementById('reply-preview');
+            preview.classList.add('hidden');
+            document.getElementById('reply-text').textContent = '';
+        }
+
+        // Attach swipe/drag gesture to a bubble (wrapper is the message row container)
+        function attachSwipeToBubble(wrapper, bubble, mid, text) {
+            let startX = 0;
+            let currentX = 0;
+            let dragging = false;
+            const threshold = 80; // px to trigger reply
+            const maxTranslate = 120;
+
+            const onPointerDown = (e) => {
+                dragging = true;
+                startX = (e.touches ? e.touches[0].clientX : e.clientX);
+                currentX = startX;
+                bubble.classList.add('dragging');
+                wrapper.style.touchAction = 'pan-y';
+            };
+
+            const onPointerMove = (e) => {
+                if (!dragging) return;
+                const x = (e.touches ? e.touches[0].clientX : e.clientX);
+                const delta = x - startX;
+                // allow both directions but prefer right-swipe for reply
+                const translate = Math.max(-maxTranslate, Math.min(maxTranslate, delta));
+                bubble.style.transform = `translateX(${translate}px)`;
+                currentX = x;
+            };
+
+            const onPointerUp = (e) => {
+                if (!dragging) return;
+                dragging = false;
+                bubble.classList.remove('dragging');
+                const delta = currentX - startX;
+                // if user swiped beyond threshold -> show reply preview
+                if (Math.abs(delta) > threshold) {
+                    // mark the UI briefly and trigger reply
+                    bubble.style.transition = 'transform 0.2s ease-out';
+                    bubble.style.transform = `translateX(${delta > 0 ? 80 : -80}px)`;
+                    setTimeout(() => {
+                        bubble.style.transition = 'transform 0.2s ease-out';
+                        bubble.style.transform = 'translateX(0)';
+                    }, 150);
+
+                    // Show reply preview (use original text)
+                    showReplyPreview({ id: mid, text: text || '' });
+
+                    // focus input
+                    const input = document.getElementById('chat-input');
+                    input.focus();
+                } else {
+                    // snap back
+                    bubble.style.transition = 'transform 0.2s ease-out';
+                    bubble.style.transform = 'translateX(0)';
+                }
+                setTimeout(() => {
+                    bubble.style.transition = '';
+                }, 250);
+            };
+
+            // touch
+            bubble.addEventListener('touchstart', onPointerDown, { passive: true });
+            bubble.addEventListener('touchmove', onPointerMove, { passive: true });
+            bubble.addEventListener('touchend', onPointerUp);
+            // mouse
+            bubble.addEventListener('mousedown', onPointerDown);
+            window.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
+
+            // cleanup if bubble removed (optional)
+            // Could add a MutationObserver to remove listeners when wrapper removed.
+        }
+
+        document.getElementById('chat-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !user || !currentRoom) return;
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            const payload = {
+                text,
+                uid: user.uid,
+                createdAt: serverTimestamp(),
+                isGhost: isGhostMode,
+                status: 'active',
+                identity: senderIdentity,
+                customName: senderIdentity === 'custom' ? document.getElementById('custom-name-input').value : null
+            };
+
+            // include reply metadata if present
+            if (replyingTo && replyingTo.id) {
+                payload.replyToId = replyingTo.id;
+                payload.replyToText = replyingTo.text;
+            }
+
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoom.id, 'messages'), payload);
+
+            // clear reply after sending
+            clearReplyPreview();
+
+            if (currentRoom.type === 'request' && user.uid !== currentRoom.ownerId) {
+                const ownerHistoryRef = doc(db, 'artifacts', appId, 'users', currentRoom.ownerId, 'history', currentRoom.id);
+                const ownerSnap = await getDoc(ownerHistoryRef);
+                if (ownerSnap.exists()) {
+                    await updateDoc(ownerHistoryRef, {
+                        unread: (ownerSnap.data().unread || 0) + 1,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        };
+
+        document.getElementById('chat-input').addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+
+    </script>
+</body>
+
+</html>
